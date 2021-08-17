@@ -28,7 +28,7 @@
     "react-scripts": "4.0.3",
     "typescript": "^4.3.5",
     "web-vitals": "^2.1.0",
-    "electron-is-dev":"2.0.0"
+    "electron-is-dev": "2.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -70,7 +70,15 @@
     "files": [
       "build/**/*",
       "node_modules/**/*"
-    ]
+    ],
+    "mac": {
+      "hardenedRuntime": true,
+      "entitlements": "entitlements.mac.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Please give us access to your microphone",
+        "NSCameraUsageDescription": "Allow your conversational partners to see you in a Grape Call. You can turn off your video anytime during a call."
+      }
+    }
   },
   "devDependencies": {
     "electron": "13.1.7",
