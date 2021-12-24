@@ -40,7 +40,7 @@
     "deploy": "gh-pages -d build",
     "eject": "react-scripts eject",
     "electron-start": "electron .",
-    "electron-dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-dev": "concurrently \"BROWSER=none yarn start\" \"electron .\"",
     "electron-pack": "electron-builder build -c.extraMetadata.main=build/electron.js"
   },
   "prettier": {

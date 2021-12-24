@@ -3,7 +3,7 @@ import {
   compileShader,
   createPiplelineStageProgram,
   createTexture,
-  glsl,
+  glsl
 } from '../helpers/webglHelper'
 
 export type BackgroundImageStage = {
@@ -65,16 +65,66 @@ export function buildBackgroundImageStage(
       return a + b;
     }
 
+    #define INV_SQRT_OF_2PI 0.39894228040143267793994605993439  // 1.0/SQRT_OF_2PI
+    #define INV_PI 0.31830988618379067153776752674503
+
+
+  vec4 smartDeNoise(sampler2D tex, vec2 uv, float sigma, float kSigma, float threshold)
+  {
+      float radius = round(kSigma*sigma);
+      float radQ = radius * radius;
+
+      float invSigmaQx2 = .5 / (sigma * sigma);      // 1.0 / (sigma^2 * 2.0)
+      float invSigmaQx2PI = INV_PI * invSigmaQx2;    // 1.0 / (sqrt(PI) * sigma)
+
+      float invThresholdSqx2 = .5 / (threshold * threshold);     // 1.0 / (sigma^2 * 2.0)
+      float invThresholdSqrt2PI = INV_SQRT_OF_2PI / threshold;   // 1.0 / (sqrt(2*PI) * sigma)
+
+      vec4 centrPx = texture(tex,uv);
+
+      float zBuff = 0.0;
+      vec4 aBuff = vec4(0.0);
+      vec2 size = vec2(textureSize(tex, 0));
+
+      for(float x=-radius; x <= radius; x++) {
+          float pt = sqrt(radQ-x*x);  // pt = yRadius: have circular trend
+          for(float y=-pt; y <= pt; y++) {
+              vec2 d = vec2(x,y);
+
+              float blurFactor = exp( -dot(d , d) * invSigmaQx2 ) * invSigmaQx2PI;
+
+              vec4 walkPx =  texture(tex,uv+d/size);
+
+              vec4 dC = walkPx-centrPx;
+              float deltaFactor = exp( -dot(dC, dC) * invThresholdSqx2) * invThresholdSqrt2PI * blurFactor;
+
+              zBuff += deltaFactor;
+              aBuff += deltaFactor*walkPx;
+          }
+      }
+      return (aBuff/zBuff) * 1.1;
+  }
+
     void main() {
       vec3 frameColor = texture(u_inputFrame, v_texCoord).rgb;
-      vec3 backgroundColor = texture(u_background, v_backgroundCoord).rgb;
+
+      vec4 smoothedFrameColor = smartDeNoise(u_inputFrame, v_texCoord, 2.5, 2., .100);
+
+      // vec3 backgroundColor = texture(u_background, v_backgroundCoord).rgb;
+      vec3 backgroundColor = vec3(0,0,0);
       float personMask = texture(u_personMask, v_texCoord).a;
+
       float lightWrapMask = 1.0 - max(0.0, personMask - u_coverage.y) / (1.0 - u_coverage.y);
       vec3 lightWrap = u_lightWrapping * lightWrapMask * backgroundColor;
       frameColor = u_blendMode * linearDodge(frameColor, lightWrap) +
         (1.0 - u_blendMode) * screen(frameColor, lightWrap);
+
       personMask = smoothstep(u_coverage.x, u_coverage.y, personMask);
-      outColor = vec4(frameColor * personMask + backgroundColor * (1.0 - personMask), 1.0);
+
+      vec3 person = personMask * smoothedFrameColor.xyz;
+      vec3  background = frameColor * (1. - personMask);
+      outColor = vec4( person + background ,  1.0);
+
     }
   `
 
@@ -192,11 +242,13 @@ export function buildBackgroundImageStage(
   function updateCoverage(coverage: [number, number]) {
     gl.useProgram(program)
     gl.uniform2f(coverageLocation, coverage[0], coverage[1])
+    console.log("coverage", coverage);
   }
 
   function updateLightWrapping(lightWrapping: number) {
     gl.useProgram(program)
     gl.uniform1f(lightWrappingLocation, lightWrapping)
+    console.log("lw", lightWrapping);
   }
 
   function updateBlendMode(blendMode: BlendMode) {

@@ -1,13 +1,13 @@
 import {
   inputResolutions,
-  SegmentationConfig,
+  SegmentationConfig
 } from '../../core/helpers/segmentationHelper'
 import { TFLite } from '../../core/hooks/useTFLite'
 import {
   compileShader,
   createPiplelineStageProgram,
   createTexture,
-  glsl,
+  glsl
 } from '../helpers/webglHelper'
 
 export function buildLoadSegmentationStage(
@@ -57,6 +57,7 @@ export function buildLoadSegmentationStage(
   const inputLocation = gl.getUniformLocation(program, 'u_inputSegmentation')
   const inputTexture = createTexture(
     gl,
+    // gl.R8,
     gl.R32F,
     segmentationWidth,
     segmentationHeight

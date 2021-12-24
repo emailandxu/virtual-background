@@ -2,18 +2,18 @@ import { BackgroundConfig } from '../../core/helpers/backgroundHelper'
 import { PostProcessingConfig } from '../../core/helpers/postProcessingHelper'
 import {
   inputResolutions,
-  SegmentationConfig,
+  SegmentationConfig
 } from '../../core/helpers/segmentationHelper'
 import { SourcePlayback } from '../../core/helpers/sourceHelper'
 import { TFLite } from '../../core/hooks/useTFLite'
 import { compileShader, createTexture, glsl } from '../helpers/webglHelper'
 import {
   BackgroundBlurStage,
-  buildBackgroundBlurStage,
+  buildBackgroundBlurStage
 } from './backgroundBlurStage'
 import {
   BackgroundImageStage,
-  buildBackgroundImageStage,
+  buildBackgroundImageStage
 } from './backgroundImageStage'
 import { buildJointBilateralFilterStage } from './jointBilateralFilterStage'
 import { buildLoadSegmentationStage } from './loadSegmentationStage'
@@ -48,6 +48,9 @@ export function buildWebGL2Pipeline(
   ]
 
   const gl = canvas.getContext('webgl2')!
+
+  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  // gl.enable(gl.BLEND);
 
   const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
 
@@ -103,6 +106,7 @@ export function buildWebGL2Pipeline(
     segmentationConfig,
     tflite
   )
+  
   const loadSegmentationStage =
     segmentationConfig.model === 'meet'
       ? buildSoftmaxStage(

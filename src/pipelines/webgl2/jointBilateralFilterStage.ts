@@ -1,11 +1,11 @@
 import {
   inputResolutions,
-  SegmentationConfig,
+  SegmentationConfig
 } from '../../core/helpers/segmentationHelper'
 import {
   compileShader,
   createPiplelineStageProgram,
-  glsl,
+  glsl
 } from '../helpers/webglHelper'
 
 export function buildJointBilateralFilterStage(
@@ -24,7 +24,11 @@ export function buildJointBilateralFilterStage(
 
     uniform sampler2D u_inputFrame;
     uniform sampler2D u_segmentationMask;
+
+    
     uniform vec2 u_texelSize;
+
+    
     uniform float u_step;
     uniform float u_radius;
     uniform float u_offset;
@@ -67,6 +71,7 @@ export function buildJointBilateralFilterStage(
       newVal /= totalWeight;
 
       outColor = vec4(vec3(0.0), newVal);
+      // outColor = vec4(vec3(0.), texture(u_segmentationMask, v_texCoord).a);
     }
   `
 
@@ -115,6 +120,7 @@ export function buildJointBilateralFilterStage(
   gl.uniform1i(inputFrameLocation, 0)
   gl.uniform1i(segmentationMaskLocation, 1)
   gl.uniform2f(texelSizeLocation, texelWidth, texelHeight)
+  console.log("texelWidth",texelWidth,   "texelHeight", texelHeight)
 
   // Ensures default values are configured to prevent infinite
   // loop in fragment shader
@@ -148,11 +154,14 @@ export function buildJointBilateralFilterStage(
     gl.uniform1f(radiusLocation, radius)
     gl.uniform1f(offsetLocation, offset)
     gl.uniform1f(sigmaTexelLocation, sigmaTexel)
+    console.log("step", step, "radius", radius, "offset", offset, "sigmaTexel", sigmaTexel);
   }
 
   function updateSigmaColor(sigmaColor: number) {
     gl.useProgram(program)
     gl.uniform1f(sigmaColorLocation, sigmaColor)
+    console.log("sigmaColor", sigmaColor);
+
   }
 
   function cleanUp() {

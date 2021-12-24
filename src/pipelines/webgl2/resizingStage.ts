@@ -1,6 +1,6 @@
 import {
   inputResolutions,
-  SegmentationConfig,
+  SegmentationConfig
 } from '../../core/helpers/segmentationHelper'
 import { TFLite } from '../../core/hooks/useTFLite'
 import {
@@ -8,7 +8,7 @@ import {
   createPiplelineStageProgram,
   createTexture,
   glsl,
-  readPixelsAsync,
+  readPixelsAsync
 } from '../helpers/webglHelper'
 
 export function buildResizingStage(
