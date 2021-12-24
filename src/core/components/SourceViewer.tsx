@@ -30,7 +30,13 @@ function SourceViewer(props: SourceViewerProps) {
   useEffect(() => {
     async function getCameraStream() {
       try {
-        const constraint = { video: true }
+        const constraint = {
+            video: {
+              width: 1280,
+              height: 720,
+              frameRate:60
+          }
+        }
         const stream = await navigator.mediaDevices.getUserMedia(constraint)
         if (videoRef.current) {
           videoRef.current.srcObject = stream

@@ -7,7 +7,7 @@ import SourceConfigCard from './core/components/SourceConfigCard'
 import ViewerCard from './core/components/ViewerCard'
 import {
   BackgroundConfig,
-  backgroundImageUrls,
+  backgroundImageUrls
 } from './core/helpers/backgroundHelper'
 import { PostProcessingConfig } from './core/helpers/postProcessingHelper'
 import { SegmentationConfig } from './core/helpers/segmentationHelper'
@@ -113,5 +113,25 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+function calcUniform(frameWidth:number, frameHeight:number, tfWidth:number, tfHeight:number){
+  var sigmaSpace = 1.0;
+  sigmaSpace *= Math.max( frameWidth / tfWidth, frameHeight / tfHeight );
+
+  var kSparsityFactor = 0.66; // Higher is more sparse.
+  var sparsity = Math.max(1, Math.sqrt(sigmaSpace) * kSparsityFactor);
+  var step = sparsity;
+  var radius = sigmaSpace;
+  var offset = step > 1 ? step * 0.5 : 0;
+
+  var texelWidth = 1 / frameWidth;
+  var texelHeight = 1 / frameHeight;
+  var texelSize = [texelWidth, texelHeight];
+  var sigmaTexel = Math.max(texelWidth, texelHeight) * sigmaSpace;
+
+  console.log("step", step, "radius", radius, "offset", offset, "sigmaTexel", sigmaTexel, "texelSize",texelSize);
+}
+
+calcUniform(640, 480, 256,256);
+console.log(123);
 
 export default App

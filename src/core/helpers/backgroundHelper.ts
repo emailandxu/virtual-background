@@ -4,8 +4,9 @@ export type BackgroundConfig = {
 }
 
 export const backgroundImageUrls = [
-  'architecture-5082700_1280',
-  'porch-691330_1280',
-  'saxon-switzerland-539418_1280',
-  'shibuyasky-4768679_1280',
-].map((imageName) => `${process.env.PUBLIC_URL}/backgrounds/${imageName}.jpg`)
+  "transparent.png",
+  'architecture-5082700_1280.jpg',
+  'porch-691330_1280.jpg',
+  'saxon-switzerland-539418_1280.jpg',
+  'shibuyasky-4768679_1280.jpg'
+].map((imageName) => `${process.env.PUBLIC_URL}/backgrounds/${imageName}`)
